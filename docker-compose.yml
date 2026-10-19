@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  door-admin:
+    build: .
+    container_name: door_admin_panel
+    restart: unless-stopped
+    ports:
+      - "8081:8000"
+    environment:
+      - MODE=admin
+    volumes:
+      - ./data:/app/data
+
+  door-user:
+    build: .
+    container_name: door_user_panel
+    restart: unless-stopped
+    ports:
+      - "8080:8000"
+    environment:
+      - MODE=user
+    volumes:
+      - ./data:/app/data
