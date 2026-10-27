@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  door-admin:
+    build: .
+    container_name: door_admin_panel
+    restart: unless-stopped
+    # Переопределяем команду из Dockerfile, добавляя --reload
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8081:8000"
+    environment:
+      - MODE=admin
+    volumes:
+      - ./data:/app/data
+      - .:/app  # Прокидываем весь код с компьютера в контейнер
+
+  door-user:
+    build: .
+    container_name: door_user_panel
+    restart: unless-stopped
+    # Переопределяем команду из Dockerfile, добавляя --reload
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8080:8000"
+    environment:
+      - MODE=user
+    volumes:
+      - ./data:/app/data
+      - .:/app  # Прокидываем весь код с компьютера в контейнер
