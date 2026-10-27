@@ -2,123 +2,194 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель СКУД</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключаем ваш локальный файл темы -->
+    <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <!-- Иконки Bootstrap для красоты интерфейса -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
-<body class="bg-light">
-<div class="container mt-4">
-    <h2 class="mb-4">Панель администратора</h2>
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#users">Пользователи</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#doors">Оборудование</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#logs">Логи</a></li>
+<body>
+
+<!-- Навигационная панель в цвет вашей темы -->
+<nav class="navbar navbar-expand-lg bg-primary shadow-sm mb-4" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-shield-lock-fill me-2"></i>СКУД Админ-панель
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <ul class="nav nav-pills mb-3 gap-2" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active shadow-sm" data-bs-toggle="tab" href="#users">
+                <i class="bi bi-people-fill me-1"></i> Пользователи
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link shadow-sm" data-bs-toggle="tab" href="#doors">
+                <i class="bi bi-door-closed-fill me-1"></i> Оборудование
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link shadow-sm" data-bs-toggle="tab" href="#logs">
+                <i class="bi bi-journal-text me-1"></i> Логи
+            </a>
+        </li>
     </ul>
 
-    <div class="tab-content bg-white p-4 border border-top-0 rounded-bottom shadow-sm">
+    <div class="tab-content card border-0 shadow-sm p-4 bg-white rounded-3">
         
         <!-- ПОЛЬЗОВАТЕЛИ -->
         <div class="tab-pane fade show active" id="users">
-            <form action="/add_user" method="POST" class="d-flex gap-2 mb-4 w-50">
-                <input type="text" class="form-control" name="name" placeholder="Имя пользователя" required>
-                <button type="submit" class="btn btn-success">Добавить</button>
+            <form action="/add_user" method="POST" class="d-flex gap-2 mb-4" style="max-width: 500px;">
+                <input type="text" class="form-control" name="name" placeholder="Имя нового пользователя" required>
+                <button type="submit" class="btn px-4" style="background-color: rgb(129, 21, 211); color: white;">
+                    <i class="bi bi-plus-lg me-1"></i>Добавить
+                </button>
             </form>
-            <table class="table align-middle">
-                <thead class="table-light"><tr><th>Имя</th><th>Персональная ссылка</th><th>Доступ (Двери)</th><th></th></tr></thead>
-                <tbody>
-                    {% for u in users %}
-                    <tr>
-                        <td class="fw-bold">{{ u.name }}</td>
-                        <td>
-                            <div class="input-group input-group-sm" style="max-width: 350px;">
-                                <input type="text" class="form-control bg-light" value="http://{{ host_ip }}:8080/u/{{ u.token }}" readonly id="link-{{ u.token }}">
-                                <button class="btn btn-outline-secondary" type="button" onclick="copyLink('link-{{ u.token }}')">Копировать</button>
-                            </div>
-                        </td>
-                        <td>
-                            <form action="/update_permissions/{{ u.id }}" method="POST" class="d-flex gap-3 align-items-center m-0">
-                                {% for d in doors %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="door_ids" value="{{ d.id }}" {% if d.id in u.permissions %}checked{% endif %}>
-                                    <label class="form-check-label">{{ d.name }}</label>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Имя</th>
+                            <th>Персональная ссылка</th>
+                            <th>Доступ (Двери)</th>
+                            <th class="text-end">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td class="fw-bold">{{ u.name }}</td>
+                            <td>
+                                <div class="input-group input-group-sm" style="max-width: 350px;">
+                                    <input type="text" class="form-control" value="http://{{ host_ip }}:8080/u/{{ u.token }}" readonly id="link-{{ u.token }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="copyLink('link-{{ u.token }}')" title="Скопировать">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
                                 </div>
-                                {% endfor %}
-                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Сохранить</button>
-                            </form>
-                        </td>
-                        <td class="text-end">
-                            <form action="/delete_user/{{ u.id }}" method="POST" class="m-0"><button class="btn btn-sm btn-danger">Удалить</button></form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <form action="/update_permissions/{{ u.id }}" method="POST" class="d-flex flex-wrap gap-3 align-items-center m-0">
+                                    {% for d in doors %}
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="door_ids" value="{{ d.id }}" id="door-{{ u.id }}-{{ d.id }}" {% if d.id in u.permissions %}checked{% endif %}>
+                                        <label class="form-check-label" for="door-{{ u.id }}-{{ d.id }}">{{ d.name }}</label>
+                                    </div>
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
+                                        <i class="bi bi-check2 me-1"></i>Сохранить
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-end">
+                                <form action="/delete_user/{{ u.id }}" method="POST" class="m-0">
+                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить пользователя?')">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- ДВЕРИ -->
         <div class="tab-pane fade" id="doors">
-            <form action="/add_door" method="POST" class="d-flex gap-2 mb-4 w-50">
+            <form action="/add_door" method="POST" class="d-flex gap-2 mb-4" style="max-width: 600px;">
                 <input type="text" class="form-control" name="name" placeholder="Название (напр. Офис 1)" required>
                 <input type="text" class="form-control" name="ip" placeholder="IP (напр. 192.168.1.50)" required>
-                <button type="submit" class="btn btn-success">Добавить</button>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-plus-lg me-1"></i>Добавить
+                </button>
             </form>
-            <table class="table align-middle">
-                <thead class="table-light"><tr><th>Название</th><th>IP Адрес</th><th class="text-end">Действия</th></tr></thead>
-                <tbody>
-                    {% for d in doors %}
-                    <tr>
-                        <td class="fw-bold">{{ d.name }}</td>
-                        <td><a href="http://{{ d.ip }}" target="_blank" class="text-decoration-none">{{ d.ip }}</a></td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-primary me-2" onclick="openDoorAdmin('{{ d.id }}')">Открыть</button>
-                            <form action="/delete_door/{{ d.id }}" method="POST" class="d-inline m-0">
-                                <button class="btn btn-sm btn-danger">Удалить</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Название</th>
+                            <th>IP Адрес</th>
+                            <th class="text-end">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in doors %}
+                        <tr>
+                            <td class="fw-bold"><i class="bi bi-cpu me-2 text-muted"></i>{{ d.name }}</td>
+                            <td><a href="http://{{ d.ip }}" target="_blank" class="text-decoration-none badge bg-secondary">{{ d.ip }}</a></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-success me-2" onclick="openDoorAdmin('{{ d.id }}')">
+                                    <i class="bi bi-unlock-fill me-1"></i>Открыть
+                                </button>
+                                <form action="/delete_door/{{ d.id }}" method="POST" class="d-inline m-0">
+                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить дверь?')">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- ЛОГИ -->
         <div class="tab-pane fade" id="logs">
-            <button class="btn btn-sm btn-outline-secondary mb-3" onclick="location.reload()">Обновить логи</button>
-            <table class="table table-sm table-striped align-middle">
-                <thead class="table-dark"><tr><th>Время</th><th>Пользователь</th><th>Дверь</th><th>Статус</th></tr></thead>
-                <tbody>
-                    {% for l in logs %}
-                    <tr>
-                        <td class="text-muted">{{ l.timestamp }}</td>
-                        <td class="fw-bold">{{ l.user_name }}</td>
-                        <td>{{ l.door_name }}</td>
-                        <td>
-                            {% if l.status == "Успешно" %}
-                            <span class="badge bg-success">Успешно</span>
-                            {% else %}
-                            <span class="badge bg-danger">{{ l.status }}</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 text-muted">История проходов</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Обновить логи
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-hover align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Время</th>
+                            <th>Пользователь</th>
+                            <th>Дверь</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in logs %}
+                        <tr>
+                            <td class="text-muted">{{ l.timestamp }}</td>
+                            <td class="fw-bold">{{ l.user_name }}</td>
+                            <td>{{ l.door_name }}</td>
+                            <td>
+                                {% if l.status == "Успешно" %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Успешно</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>{{ l.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Функция копирования ссылки в буфер обмена
     function copyLink(elementId) {
         var copyText = document.getElementById(elementId);
         copyText.select();
-        copyText.setSelectionRange(0, 99999); // Для мобильных
+        copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value).then(() => {
             alert("Ссылка скопирована: " + copyText.value);
         });
     }
 
-    // Функция открытия двери из админки
     function openDoorAdmin(doorId) {
         fetch(`/admin_open/${doorId}`, { method: 'POST' })
             .then(r => r.json())
@@ -131,11 +202,10 @@
             })
             .catch(() => alert('Сетевая ошибка связи с сервером'));
     }
+
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Проверяем, есть ли сохраненная вкладка в памяти браузера
         let activeTab = localStorage.getItem('activeTab');
         if (activeTab) {
-            // Если есть, находим ее и активируем
             let tabElement = document.querySelector(`a[href="${activeTab}"]`);
             if (tabElement) {
                 let tab = new bootstrap.Tab(tabElement);
@@ -143,11 +213,9 @@
             }
         }
 
-        // 2. Слушаем переключения вкладок и запоминаем выбор
         let tabLinks = document.querySelectorAll('a[data-bs-toggle="tab"]');
         tabLinks.forEach(function(link) {
             link.addEventListener('shown.bs.tab', function(event) {
-                // Сохраняем id вкладки (например, #doors или #users)
                 localStorage.setItem('activeTab', event.target.getAttribute('href'));
             });
         });
