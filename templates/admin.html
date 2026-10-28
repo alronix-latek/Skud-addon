@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель СКУД</title>
-    <!-- Подключаем ваш локальный файл темы -->
-    <link href="/static/bootstrap.min.css" rel="stylesheet">
-    <!-- Иконки Bootstrap для красоты интерфейса -->
+    <!-- Чистое подключение вашей сгенерированной темы -->
+    <link href="/static/bootstrap.min.css?v=4" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </head>
 <body>
 
-<!-- Навигационная панель в цвет вашей темы -->
 <nav class="navbar navbar-expand-lg bg-primary shadow-sm mb-4" data-bs-theme="dark">
     <div class="container">
         <a class="navbar-brand fw-bold" href="#">
@@ -39,13 +37,13 @@
         </li>
     </ul>
 
-    <div class="tab-content card border-0 shadow-sm p-4 bg-white rounded-3">
+    <div class="tab-content card border-0 shadow-sm p-4 bg-body rounded-3">
         
         <!-- ПОЛЬЗОВАТЕЛИ -->
         <div class="tab-pane fade show active" id="users">
             <form action="/add_user" method="POST" class="d-flex gap-2 mb-4" style="max-width: 500px;">
                 <input type="text" class="form-control" name="name" placeholder="Имя нового пользователя" required>
-                <button type="submit" class="btn px-4" style="background-color: rgb(129, 21, 211); color: white;">
+                <button type="submit" class="btn btn-primary px-4">
                     <i class="bi bi-plus-lg me-1"></i>Добавить
                 </button>
             </form>
@@ -65,8 +63,9 @@
                             <td class="fw-bold">{{ u.name }}</td>
                             <td>
                                 <div class="input-group input-group-sm" style="max-width: 350px;">
-                                    <input type="text" class="form-control" value="http://{{ host_ip }}:8080/u/{{ u.token }}" readonly id="link-{{ u.token }}">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="copyLink('link-{{ u.token }}')" title="Скопировать">
+                                    <!-- Абсолютно стандартное поле без ручных раскрасок -->
+                                    <input type="text" class="form-control bg-body-tertiary" value="http://{{ host_ip }}:8080/u/{{ u.token }}" readonly id="link-{{ u.token }}">
+                                    <button class="btn btn-outline-primary" type="button" onclick="copyLink('link-{{ u.token }}')" title="Скопировать">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </div>
