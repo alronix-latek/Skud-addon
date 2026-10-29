@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Мой Доступ</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .door-btn { font-size: 1.5rem; padding: 2rem 1rem; border-radius: 15px; }
-    </style>
+    <link href="/static/bootstrap.min.css?v=4" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-5" style="max-width: 500px;">
@@ -17,12 +13,12 @@
     <div class="d-flex flex-column gap-3">
         {% if doors %}
             {% for d in doors %}
-            <button class="btn btn-primary door-btn shadow-sm" onclick="openDoor('{{ user.token }}', '{{ d.id }}')">
+            <button class="btn btn-primary fs-4 py-4 px-3 rounded shadow-sm" onclick="openDoor('{{ user.token }}', '{{ d.id }}')">
                 Отрыть: {{ d.name }}
             </button>
             {% endfor %}
         {% else %}
-            <div class="alert alert-warning text-center">У вас нет доступных дверей.</div>
+            <div class="alert text-bg-primary text-center">У вас нет доступных дверей.</div>
         {% endif %}
     </div>
     
